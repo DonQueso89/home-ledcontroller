@@ -7,6 +7,7 @@ from config import NUM_LEDS
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
+from adapter import pixels
 
 logger = logging.getLogger(__file__)
 app = FastAPI()
@@ -42,9 +43,11 @@ async def on(led_num: int, r:Optional[int]=0, g:Optional[int]=0, b: Optional[int
     global leds
     if g+r+b == 0:
         g, r, b = DEFAULT_COLOR
+
+    pixels[led_num] = (g, r, b)
     leds[led_num] = (g, r, b)
     queue.put(led_num, r, g, b)
-
+    pixels.show()
 
     return True
 
@@ -53,6 +56,9 @@ async def off(led_num: int, queue: MutationQueue = Depends()):
     global leds
     leds[led_num] = OFF
     queue.put(led_num, OFF[1], OFF[0], OFF[2])
+    pixels[led_num] = OFF
+    pixels.show()
+
     return False
 
 @app.websocket("/websocket/")
