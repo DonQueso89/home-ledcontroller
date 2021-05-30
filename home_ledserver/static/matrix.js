@@ -1,6 +1,5 @@
 const SERVER_URL = "http://raspberrypi.local:8000";
 const WEBSOCKET_URL = "ws://raspberrypi.local:8000/websocket/";
-
 async function ledOn(n) {
   const url = `${SERVER_URL}/state/${n}/on/`;
   const response = await fetch(url, {

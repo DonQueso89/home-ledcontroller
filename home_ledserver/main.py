@@ -1,9 +1,9 @@
 import logging
+import config
 from asyncio import Queue, QueueFull
 from typing import Optional, List, Tuple
 from fastapi import FastAPI, Request, WebSocket, Depends
 from constants import BLUE, OFF
-from config import NUM_LEDS
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
@@ -11,6 +11,7 @@ from adapter import pixels
 
 logger = logging.getLogger(__file__)
 app = FastAPI()
+settings = config.get()
 
 app.mount("/static", StaticFiles(directory='static'), name='static')
 templates = Jinja2Templates(directory="templates")
@@ -18,7 +19,7 @@ templates = Jinja2Templates(directory="templates")
 DEFAULT_COLOR = BLUE
 
 #TODO: settings section in advanced user guide of fastapi
-leds: List[Tuple[int, int, int]] = [(0,0,0) for x in range(NUM_LEDS)]
+leds: List[Tuple[int, int, int]] = [(0,0,0) for x in range(settings.num_leds)]
 
 class MutationQueue:
     # When nothing is listening to the queue, mutations will be dropped

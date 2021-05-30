@@ -1,0 +1,8 @@
+[Unit]
+Description=Home LEDServer
+
+[Service]
+ExecStart=/usr/bin/env sudo led-server
+
+[Install]
+WantedBy=multi-user.target
