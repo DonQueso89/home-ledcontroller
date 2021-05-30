@@ -1,0 +1,29 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Home LED Controller</title>
+  <meta name="description" content="Home lED Controller">
+  <meta name="author" content="DonQueso89">
+
+  <link rel="stylesheet" href={{ url_for("static",  path="/styles.css") }}>
+
+</head>
+
+<body>
+  <div class="main-container">
+    <h1>Home LED Controller</h1>
+    <div class="matrix-container">
+        <div class="matrix">
+            {% for led in led_state %}
+        <div class="matrix-element" id={{ 'element' + loop.index0 | string }} data-led-index={{ loop.index0 }} style="{{ 'background-color: rgb(' + led[1]|string + ',' + led[0]|string + ',' + led[2]|string + ')'  }}">
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+  </div>
+  <script src={{ url_for("static", path="/matrix.js") }}></script>
+</body>
+</html>
