@@ -23,6 +23,11 @@
             {% endfor %}
         </div>
     </div>
+    <div class="control-panel">
+      <input type="color" name="colorpicker" id="colorpicker">
+      <label for="colorpicker">LED Color</label>
+      <button>Randomize</button>
+    </div>
   </div>
   <script src={{ url_for("static", path="/matrix.js") }}></script>
 </body>
