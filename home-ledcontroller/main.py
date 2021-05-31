@@ -1,3 +1,4 @@
+import uvicorn
 import logging
 import config
 from asyncio import Queue, QueueFull
@@ -68,3 +69,7 @@ async def websocket_endpoint(websocket: WebSocket, queue: MutationQueue = Depend
     while True:
         data = await queue.q.get()
         await websocket.send_text(data)
+
+
+def main():
+    uvicorn.run(app, host=settings.host, port=settings.port, log_level="info")

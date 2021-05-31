@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "home_ledserver"
+name = "home-ledcontroller"
 version = "0.1.0"
 description = ""
 authors = ["DonQueso89 <kg.v.ekeren@gmail.com>"]
@@ -18,3 +18,6 @@ black = {version = "^21.5b1", allow-prereleases = true}
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+led-server = 'home-ledcontroller.main:main'
