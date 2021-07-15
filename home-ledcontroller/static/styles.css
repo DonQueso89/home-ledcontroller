@@ -37,3 +37,13 @@ h1 {
     min-width: 100px;
     min-height: 30px;
 }
+
+.control-panel {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.control-panel > * {
+    margin: 10px;
+}

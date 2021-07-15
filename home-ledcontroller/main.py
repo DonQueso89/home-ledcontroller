@@ -1,7 +1,7 @@
 import uvicorn
 import logging
 import config
-from asyncio import Queue, QueueFull
+from asyncio import Queue, QueueFull, get_event_loop
 from typing import Optional, List, Tuple
 from fastapi import FastAPI, Request, WebSocket, Depends
 from constants import BLUE, OFF
@@ -9,6 +9,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from adapter import pixels
+from models import Color
 
 logger = logging.getLogger(__file__)
 app = FastAPI()
@@ -32,18 +33,22 @@ class MutationQueue:
         except QueueFull:
             logger.info("Mutation queue is full, dropping mutation")
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse, name="root")
 async def root(request: Request):
-    return templates.TemplateResponse("ui.html", {"request":request, "led_state": leds})
+    return templates.TemplateResponse("ui.html", {"request":request, "led_state": leds, "settings": settings})
 
 @app.get("/state/")
 async def state():
     return [(r,g,b) for g,r,b in leds]
 
 @app.post("/state/{led_num}/on/")
-async def on(led_num: int, r:Optional[int]=0, g:Optional[int]=0, b: Optional[int]=0, queue: MutationQueue = Depends()):
+async def on(led_num: int, color: Optional[Color]=None, queue: MutationQueue = Depends()):
     global leds
-    if g+r+b == 0:
+    if color:
+        r, g, b = color.r, color.g, color.b
+        if g+r+b == 0:
+            g, r, b = DEFAULT_COLOR
+    else:
         g, r, b = DEFAULT_COLOR
 
     pixels[led_num] = (g, r, b)
@@ -63,7 +68,40 @@ async def off(led_num: int, queue: MutationQueue = Depends()):
 
     return False
 
-@app.websocket("/websocket/")
+@app.post("/state/fill/")
+async def fill(color: Optional[Color]=None, queue: MutationQueue = Depends()):
+    global leds
+    if color:
+        r, g, b = color.r, color.g, color.b
+        if g+r+b == 0:
+            g, r, b = DEFAULT_COLOR
+    else:
+        g, r, b = DEFAULT_COLOR
+    
+    for i in range(settings.num_leds):
+        pixels[i] = (g, r, b)
+        leds[i] = (g, r, b)
+        queue.put(i, r, g, b)
+
+    pixels.show()
+
+    return True
+
+@app.post("/state/clear/")
+async def clear(queue: MutationQueue = Depends()):
+    global leds
+    
+    for i in range(settings.num_leds):
+        pixels[i] = OFF
+        leds[i] = OFF
+        queue.put(i, *OFF)
+
+    pixels.show()
+
+    return True
+
+
+@app.websocket("/websocket/", name="websocket")
 async def websocket_endpoint(websocket: WebSocket, queue: MutationQueue = Depends()):
     await websocket.accept()
     while True:
@@ -71,5 +109,8 @@ async def websocket_endpoint(websocket: WebSocket, queue: MutationQueue = Depend
         await websocket.send_text(data)
 
 
-def main():
-    uvicorn.run(app, host=settings.host, port=settings.port, log_level="info")
+def run():
+    uvicorn.run("main:app", host=settings.host, port=settings.port, log_level="info", reload=settings.reload)
+
+if __name__ == "__main__":
+    run()

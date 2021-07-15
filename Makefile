@@ -1,2 +1,2 @@
 serve: 
-	uvicorn home_ledserver/main:app --reload
+	uvicorn ./home-ledcontroller/main:app --reload

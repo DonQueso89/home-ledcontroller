@@ -24,11 +24,16 @@
         </div>
     </div>
     <div class="control-panel">
-      <input type="color" name="colorpicker" id="colorpicker">
-      <label for="colorpicker">LED Color</label>
-      <button>Randomize</button>
+      <div class="colorpicker-container">
+        <input type="color" name="colorpicker" id="colorpicker">
+        <label for="colorpicker">LED Color</label>
+      </div>
+      <button id="fill-button">Fill</button>
+      <button id="clear-button">Clear</button>
+      <button id="randomize-button">Randomize</button>
+      <button id="stop-button">Stop sequence</button>
     </div>
   </div>
-  <script src={{ url_for("static", path="/matrix.js") }}></script>
+  <script server-url={{ request.url_for('root') }} websocket-url={{ request.url_for("websocket") }} src={{ url_for("static", path="/matrix.js") }}></script>
 </body>
 </html>

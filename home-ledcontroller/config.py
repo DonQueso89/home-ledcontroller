@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     pixel_pin: str = "D18"
     color_order: str = "GRB"
     num_leds: int = 50
+    reload: bool = False
 
     class Config:
         env_file = ".env"
